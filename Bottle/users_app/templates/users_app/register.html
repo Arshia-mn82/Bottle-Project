@@ -105,7 +105,7 @@
   <body>
     <div class="card">
       <h2>Register</h2>
-      <form method="post">
+      <form method="post" action="{% url 'register' %}">
         {% csrf_token %}
 
         <label for="id_username">Username</label>
