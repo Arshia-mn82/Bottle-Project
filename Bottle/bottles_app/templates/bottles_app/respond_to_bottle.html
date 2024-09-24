@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Bottle</title>
+    <title>Respond to Bottle</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -19,7 +19,7 @@
             display: block;
             margin: 10px 0 5px;
         }
-        textarea, input {
+        textarea {
             width: 100%;
             padding: 10px;
             margin-bottom: 10px;
@@ -37,16 +37,13 @@
     </style>
 </head>
 <body>
-    <h1>Create Bottle</h1>
+    <h1>Respond to Bottle</h1>
+    <h2>Message: {{ bottle.message }}</h2>
     <form method="post">
         {% csrf_token %}
-        <label for="message">Message:</label>
-        <textarea name="message" required></textarea>
-        <label for="character_limit">Character Limit:</label>
-        <input type="number" name="character_limit" required>
-        <label for="range_limit">Range Limit:</label>
-        <input type="number" step="0.01" name="range_limit" required>
-        <button type="submit">Send Bottle</button>
+        <label for="response_message">Response:</label>
+        <textarea name="response_message" required></textarea>
+        <button type="submit">Send Response</button>
     </form>
     <a href="{% url 'bottle_list' %}">Back to Bottle List</a>
 </body>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bottle List</title>
+    <title>Shop</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -20,7 +20,6 @@
         a {
             text-decoration: none;
             color: #4CAF50;
-            margin-right: 10px;
         }
         a:hover {
             text-decoration: underline;
@@ -28,14 +27,15 @@
     </style>
 </head>
 <body>
-    <h1>Bottle List</h1>
-    {% for bottle in bottles %}
+    <h1>Shop</h1>
+    <h2>Bottle Items</h2>
+    {% for item in items %}
         <div>
-            <h2>Message: {{ bottle.message }}</h2>
-            <a href="{% url 'read_bottle' bottle.id %}">Read</a>
-            <a href="{% url 'respond_to_bottle' bottle.id %}">Respond</a>
+            <h3>{{ item.name }}</h3>
+            <p>{{ item.description }}</p>
+            <p>Price: {{ item.price }} coins</p>
+            <a href="{% url 'buy_item' item.id %}">Buy</a>
         </div>
     {% endfor %}
-    <a href="{% url 'create_bottle' %}">Create a New Bottle</a>
 </body>
 </html>

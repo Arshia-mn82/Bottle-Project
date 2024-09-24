@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rankings</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        a {
+            text-decoration: none;
+            color: #4CAF50;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>Rankings</h1>
+    <table>
+        <tr>
+            <th>User</th>
+            <th>Bottles Read</th>
+        </tr>
+        {% for ranking in rankings %}
+        <tr>
+            <td>{{ ranking.user_profile.user.username }}</td>
+            <td>{{ ranking.bottles_read }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <a href="{% url 'bottle_list' %}">Back to Bottle List</a>
+</body>
+</html>

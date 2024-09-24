@@ -2,61 +2,96 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import Bottle
-from .forms import BottleForm
-from django.views.decorators.csrf import csrf_exempt
 from users_app.models import UserProfile
-from django.contrib.auth import login, authenticate
-from django.contrib.auth.forms import AuthenticationForm
 
-@csrf_exempt
-def login_view(request):
-    if request.method == "POST":
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-            user = authenticate(request, username=username, password=password)
-            if user is not None:
-                login(request, user)
-                messages.success(request, "Logged in successfully!")
-                return redirect('create_bottle')  # Redirect to bottle creation after login
-            else:
-                messages.error(request, "Invalid username or password.")
-        else:
-            messages.error(request, "Invalid login credentials.")
-    else:
-        form = AuthenticationForm()
-    return render(request, "users_app/login.html", {"form": form})
 
 @login_required
 def create_bottle(request):
-    # Check if the user has a UserProfile
-    try:
-        user_profile = UserProfile.objects.get(user=request.user)
-    except UserProfile.DoesNotExist:
-        messages.error(request, "User profile does not exist. Please register.")
-        return redirect('register')  # Redirect to the register page if profile not found
-
     if request.method == "POST":
-        form = BottleForm(request.POST)
-        if form.is_valid():
-            bottle = form.save(commit=False)
-            bottle.sender = request.user
-            
-            # Set coordinates from the user's profile
-            bottle.x = user_profile.x
-            bottle.y = user_profile.y
-            
-            bottle.save()
-            user_profile.coins += 10
+        message = request.POST.get("message")
+        character_limit = request.POST.get("character_limit")
+        range_limit = request.POST.get("range_limit")
+
+        user_profile = UserProfile.objects.get(user=request.user)
+
+        if user_profile.coins >= 10:
+            bottle = Bottle.objects.create(
+                message=message,
+                character_limit=character_limit,
+                range_limit=range_limit,
+                sender=request.user,
+            )
+            user_profile.coins -= 10
             user_profile.save()
             messages.success(request, "Bottle sent successfully!")
             return redirect("bottle_list")
-    else:
-        form = BottleForm()
+        else:
+            messages.error(request, "Not enough coins to send a bottle.")
 
-    return render(request, "bottles_app/create_bottle.html", {"form": form})
+    return render(request, "bottles_app/create_bottle.html")
+
 
 def bottle_list(request):
     bottles = Bottle.objects.all()
-    return render(request, "bottles_app/bottle_list.html", {"bottles": bottles})
+    user_profile = UserProfile.objects.get(user=request.user)
+    visible_bottles = []
+
+    for bottle in bottles:
+        distance = (
+            (user_profile.x - bottle.sender.profile.x) ** 2
+            + (user_profile.y - bottle.sender.profile.y) ** 2
+        ) ** 0.5
+        if distance <= bottle.range_limit:
+            visible_bottles.append(bottle)
+
+    return render(request, "bottles_app/bottle_list.html", {"bottles": visible_bottles})
+
+
+response_cost = 5  # Cost to respond to a bottle
+reward_coins_read = 15  # Coins earned for reading a bottle
+
+
+@login_required
+def respond_to_bottle(request, bottle_id):
+    bottle = Bottle.objects.get(id=bottle_id)
+    user_profile = UserProfile.objects.get(user=request.user)
+
+    distance = (
+        (user_profile.x - bottle.sender.profile.x) ** 2
+        + (user_profile.y - bottle.sender.profile.y) ** 2
+    ) ** 0.5
+    if user_profile.can_respond and distance <= bottle.range_limit:
+        if request.method == "POST":
+            response_message = request.POST.get("response_message")
+
+            if user_profile.coins >= response_cost:
+                user_profile.coins -= response_cost
+                user_profile.save()
+
+                messages.success(request, "Response sent successfully!")
+                return redirect("bottle_list")
+            else:
+                messages.error(request, "You do not have enough coins to respond.")
+                return redirect("bottle_list")
+
+        return render(request, "bottles_app/respond_to_bottle.html", {"bottle": bottle})
+    else:
+        messages.error(
+            request,
+            "You need to purchase the ability to respond or you're not in range.",
+        )
+        return redirect("bottle_list")
+
+
+@login_required
+def read_bottle(request, bottle_id):
+    bottle = Bottle.objects.get(id=bottle_id)
+    user_profile = UserProfile.objects.get(user=request.user)
+
+    user_profile.coins += reward_coins_read
+    user_profile.save()
+
+    messages.success(
+        request, f"You earned {reward_coins_read} coins for reading this bottle!"
+    )
+    return render(request, "bottles_app/read_bottle.html", {"bottle": bottle})

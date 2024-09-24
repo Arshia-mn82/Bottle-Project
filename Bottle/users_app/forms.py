@@ -3,7 +3,6 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import UserProfile
 
-
 class CustomUserCreationForm(UserCreationForm):
     x = forms.FloatField(required=True, help_text="Enter X coordinate.")
     y = forms.FloatField(required=True, help_text="Enter Y coordinate.")

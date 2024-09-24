@@ -1,3 +1,10 @@
-from django.contrib import admin
+from django.contrib.admin import register,ModelAdmin
+from .models import *
 
-# Register your models here.
+@register(BottleItem)
+class BottleItemAdmin(ModelAdmin):
+    pass
+
+@register(Ability)
+class AbilityAdmin(ModelAdmin):
+    pass
