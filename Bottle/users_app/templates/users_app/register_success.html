@@ -6,20 +6,27 @@
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f7f6;
-            height: 100vh;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
+            height: 100vh;
+        }
+        .message {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             text-align: center;
         }
         h1 {
             color: #333;
         }
         a {
-            margin: 10px;
-            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
             color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
         }
         a:hover {
             text-decoration: underline;
@@ -27,9 +34,10 @@
     </style>
 </head>
 <body>
-    <h1>Registration Successful!</h1>
-    <p>You have been registered successfully.</p>
-    <a href="{% url 'login' %}">Log In</a>
+    <div class="message">
+        <h1>Registration Successful!</h1>
+        <p>You have been registered successfully.</p>
+        <a href="{% url 'login' %}">Log In</a>
+    </div>
 </body>
 </html>
-    

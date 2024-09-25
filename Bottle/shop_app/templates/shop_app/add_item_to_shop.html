@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Item to Shop</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Add Item</h1>
+        <form method="post">
+            {% csrf_token %}
+            <label for="item_type">Item Type:</label>
+            <select id="item_type" name="item_type" required>
+                <option value="">Select an item type</option>
+                <option value="bottle">Bottle</option>
+                <option value="ability">Ability</option>
+            </select>
+            
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="price">Price:</label>
+            <input type="number" id="price" name="price" required>
+
+            <div id="bottle_fields" style="display: none;">
+                <label for="character_limit">Character Limit:</label>
+                <input type="number" id="character_limit" name="character_limit">
+
+                <label for="range_limit">Range Limit:</label>
+                <input type="number" id="range_limit" name="range_limit">
+            </div>
+
+            <div id="ability_fields" style="display: none;">
+                <label for="description">Description:</label>
+                <textarea id="description" name="description"></textarea>
+            </div>
+
+            <button type="submit">Add Item</button>
+        </form>
+    </div>
+    <script>
+        document.getElementById('item_type').addEventListener('change', function() {
+            var bottleFields = document.getElementById('bottle_fields');
+            var abilityFields = document.getElementById('ability_fields');
+
+            if (this.value === 'bottle') {
+                bottleFields.style.display = 'block';
+                abilityFields.style.display = 'none';
+            } else if (this.value === 'ability') {
+                bottleFields.style.display = 'none';
+                abilityFields.style.display = 'block';
+            } else {
+                bottleFields.style.display = 'none';
+                abilityFields.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

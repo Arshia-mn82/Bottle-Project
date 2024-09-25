@@ -4,30 +4,44 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 from .models import UserProfile
 from django.contrib.auth.models import User
+from .forms import CustomUserCreationForm
+
+
+def register_successful(request):
+    return render(request, "users_app/register_success.html")
+
 
 def register(request):
     if request.method == "POST":
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        x = request.POST.get('x')
-        y = request.POST.get('y')
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
 
-        user = User.objects.create_user(username=username, password=password)
-        UserProfile.objects.create(user=user, x=x, y=y)
-        messages.success(request, "Registration successful!")
-        return redirect("login")
-    return render(request, "users_app/register.html")
+            x = form.cleaned_data["x"]
+            y = form.cleaned_data["y"]
 
-def login_view(request):
+            UserProfile.objects.create(user=user, x=x, y=y)
+            messages.success(request, "Registration successful!")
+            return redirect("register_success")
+    else:
+        form = CustomUserCreationForm()
+
+    return render(request, "users_app/register.html", {"form": form})
+
+
+def login_success(request):
+    return render(request, "users_app/login_success.html")
+
+
+def login_user(request):
     if request.method == "POST":
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+        username = request.POST["username"]
+        password = request.POST["password"]
         user = authenticate(request, username=username, password=password)
-
         if user is not None:
             login(request, user)
-            messages.success(request, "Login successful!")
-            return redirect("bottle_list")
+            return redirect("login_success")
         else:
-            messages.error(request, "Invalid username or password.")
+            messages.error(request, "Invalid username or password. Please register.")
+            return redirect("register")
     return render(request, "users_app/login.html")

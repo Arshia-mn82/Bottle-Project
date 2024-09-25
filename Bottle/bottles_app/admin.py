@@ -5,4 +5,8 @@ from .models import *
 class BottleAdmin(ModelAdmin):
     pass
 
+@register(Response)
+class ResponseAdmin(ModelAdmin):
+    pass
+
 
